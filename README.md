@@ -4,6 +4,10 @@ A random focus timer for people who overthink where to start.
 
 DopaDraw is a lightweight random focus timer designed to help you overcome the hardest part of productivity:
 
+<img width="2223" height="1298" alt="image" src="https://github.com/user-attachments/assets/e79a2313-04c4-4d38-9795-3eb4620fdef8" />
+<img width="2247" height="1069" alt="image" src="https://github.com/user-attachments/assets/f87e5526-bf91-4c3d-9b82-32695d7373be" />
+
+
 **getting started.**
 
 Instead of asking you to plan the perfect schedule,
