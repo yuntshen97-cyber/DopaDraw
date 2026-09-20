@@ -1,0 +1,12 @@
+🎉 v1.0.0(0.0.7)
+
+First public release of DopaDraw.
+
+Features:
+- Random task selection
+- Random focus duration
+- Add/Delete tasks
+- Skip current task
+- Import & Export
+- Local-first storage
+- English / Chinese
