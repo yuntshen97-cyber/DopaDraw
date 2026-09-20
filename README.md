@@ -46,7 +46,7 @@ One step closer to beginning.
 - [x] Local-first storage
 - [x] Import / Export
 - [ ] PWA
-- [ ] English support
+- [x] English support
 - [ ] Cloud Sync (Optional)
 - [ ] Mobile App
 
