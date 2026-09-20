@@ -1,0 +1,2291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7fb">
+  <meta name="description" content="">
+  <title></title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23171735'/%3E%3Cpath d='M19 14h26v9c0 8-5 12-9 14 4 2 9 6 9 13H19c0-7 5-11 9-13-4-2-9-6-9-14z' fill='%23d8ff65'/%3E%3Cpath d='M24 21h16c0 6-4 9-8 11-4-2-8-5-8-11z' fill='%23ff6b6b'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #171735;
+      --text: #171735;
+      --muted: #67677f;
+      --paper: #f7f7fb;
+      --panel: #ffffff;
+      --line: #dedee9;
+      --lime: #d8ff65;
+      --lime-dark: #a8d820;
+      --coral: #ff6b6b;
+      --blue: #6667ed;
+      --on-ink: #ffffff;
+      --surface: #ffffff;
+      --surface-soft: #f3f3f8;
+      --surface-muted: #efeff8;
+      --surface-faint: #fbfbfd;
+      --panel-glass: rgba(255, 255, 255, .92);
+      --pill-glass: rgba(255, 255, 255, .75);
+      --timer-face: #202044;
+      --body-glow-primary: rgba(216, 255, 101, .38);
+      --body-glow-secondary: rgba(102, 103, 237, .14);
+      --shadow: 0 20px 60px rgba(31, 31, 70, .11);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; background: var(--paper); }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 11% 8%, var(--body-glow-primary), transparent 24rem),
+        radial-gradient(circle at 93% 86%, var(--body-glow-secondary), transparent 28rem),
+        var(--paper);
+      font-family: Inter, ui-rounded, "SF Pro Rounded", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+
+    .app-shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      color: var(--lime);
+      background: var(--ink);
+      box-shadow: 0 10px 26px rgba(23, 23, 53, .2);
+    }
+    .brand-mark svg { width: 25px; height: 25px; }
+    .brand h1 { margin: 0; font-size: 1.25rem; letter-spacing: -.02em; }
+    .brand p { margin: 1px 0 0; color: var(--muted); font-size: .82rem; }
+
+    .local-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: var(--pill-glass);
+      font-size: .82rem;
+      white-space: nowrap;
+    }
+    .local-pill::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--lime-dark);
+      box-shadow: 0 0 0 4px rgba(168, 216, 32, .14);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .language-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--pill-glass);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .language-icon { line-height: 1; }
+    .language-divider { color: var(--line); }
+    .language-button {
+      padding: 2px 4px;
+      border: 0;
+      color: inherit;
+      background: transparent;
+      font: inherit;
+      font-size: .82rem;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .language-button[aria-pressed="true"] { color: var(--ink); }
+    .language-button:focus-visible {
+      outline: 3px solid rgba(102, 103, 237, .3);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.06fr) minmax(360px, .94fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--panel-glass);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .setup-panel { padding: 28px; }
+    .timer-panel {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 650px;
+      overflow: hidden;
+      color: var(--on-ink);
+      background: var(--ink);
+      border-color: transparent;
+    }
+    .timer-panel::before {
+      content: "";
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      right: -110px;
+      top: -95px;
+      border-radius: 50%;
+      background: rgba(216, 255, 101, .14);
+      filter: blur(1px);
+    }
+    .timer-panel::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      left: -90px;
+      bottom: 72px;
+      border: 42px solid rgba(102, 103, 237, .17);
+      border-radius: 50%;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .eyebrow {
+      margin: 0 0 5px;
+      color: var(--blue);
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .section-heading h2 { margin: 0; font-size: 1.45rem; letter-spacing: -.03em; }
+    .task-count {
+      display: inline-grid;
+      place-items: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 12px;
+      background: var(--surface-muted);
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    .task-form { display: flex; gap: 10px; }
+    .text-input, .number-input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--ink);
+      background: var(--surface);
+      outline: none;
+      transition: border-color .18s, box-shadow .18s;
+    }
+    .text-input { min-height: 50px; padding: 0 15px; }
+    .number-input { min-height: 46px; padding: 0 12px; font-weight: 750; }
+    .text-input:focus, .number-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(102, 103, 237, .12);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .15s, filter .15s, opacity .15s;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.03); }
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+    .btn:focus-visible, .icon-btn:focus-visible {
+      outline: 3px solid rgba(102, 103, 237, .42);
+      outline-offset: 3px;
+    }
+    .btn:disabled { cursor: not-allowed; opacity: .45; }
+    .btn-primary { color: var(--ink); background: var(--lime); }
+    .btn-dark { color: var(--on-ink); background: var(--ink); }
+    .btn-light { color: var(--ink); background: var(--surface); }
+    .btn-ghost { color: rgba(255,255,255,.78); background: rgba(255,255,255,.1); }
+
+    .task-list {
+      display: grid;
+      gap: 10px;
+      min-height: 185px;
+      max-height: 270px;
+      margin: 18px 0 12px;
+      padding: 0;
+      overflow: auto;
+      list-style: none;
+    }
+    .task-list-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+    .clear-tasks-button {
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--muted);
+      background: var(--surface);
+      font-size: .78rem;
+    }
+    .empty-state {
+      display: grid;
+      place-items: center;
+      min-height: 185px;
+      padding: 24px;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      text-align: center;
+      background: var(--surface-faint);
+    }
+    .empty-state strong { display: block; margin-bottom: 4px; color: var(--text); }
+
+    .task-item {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) auto 36px;
+      gap: 10px;
+      align-items: center;
+      min-height: 58px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+    .task-item.is-active { border-color: rgba(102, 103, 237, .52); box-shadow: 0 0 0 3px rgba(102, 103, 237, .1); }
+    .task-item.is-completed { opacity: .6; }
+    .task-item.is-completed .task-name { text-decoration: line-through; }
+    .task-index {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      color: var(--muted);
+      background: var(--surface-muted);
+      font-size: .8rem;
+      font-weight: 800;
+    }
+    .task-name { overflow: hidden; font-weight: 720; text-overflow: ellipsis; white-space: nowrap; }
+    .duration-badge {
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: #52536e;
+      background: #f0f0ff;
+      font-size: .78rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .duration-badge.unset { color: #858596; background: #f4f4f7; }
+    .duration-badge.active { color: var(--on-ink); background: var(--blue); }
+    .duration-badge.completed { color: #4e6620; background: #e8f8b8; }
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: 0;
+      border-radius: 11px;
+      color: #8b8b9c;
+      background: transparent;
+      cursor: pointer;
+    }
+    .icon-btn:hover { color: var(--coral); background: var(--surface-soft); }
+    .icon-btn svg { width: 18px; height: 18px; }
+
+    .rule-card {
+      padding: 20px;
+      border-radius: 20px;
+      background: var(--surface-soft);
+    }
+    .rule-title { margin: 0 0 14px; font-size: .92rem; font-weight: 850; }
+    .range-row { display: grid; grid-template-columns: 1fr 20px 1fr; gap: 10px; align-items: end; }
+    .field label { display: block; margin: 0 0 6px; color: var(--muted); font-size: .78rem; font-weight: 700; }
+    .range-divider { padding-bottom: 12px; color: #aaaabd; text-align: center; }
+    .validation { min-height: 21px; margin: 7px 0 4px; color: #c13e4d; font-size: .78rem; }
+    .draw-btn { width: 100%; min-height: 52px; }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 4px 0 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--surface);
+    }
+    .toggle-copy strong { display: block; font-size: .88rem; }
+    .toggle-copy span { color: var(--muted); font-size: .75rem; }
+    .switch { position: relative; flex: 0 0 auto; width: 48px; height: 28px; }
+    .switch input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .switch-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: #d7d7e2;
+      cursor: pointer;
+      transition: background .18s;
+    }
+    .switch-track::after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: 0 2px 8px rgba(23,23,53,.2);
+      transition: transform .18s;
+    }
+    .switch input:checked + .switch-track { background: var(--blue); }
+    .switch input:checked + .switch-track::after { transform: translateX(20px); }
+    .switch input:focus-visible + .switch-track { outline: 3px solid rgba(102,103,237,.36); outline-offset: 3px; }
+
+    .timer-top, .timer-core, .timer-footer { position: relative; z-index: 1; }
+    .timer-top { display: flex; justify-content: space-between; align-items: center; padding: 26px 28px 0; }
+    .round-label { color: rgba(255,255,255,.58); font-size: .78rem; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+    .round-chip {
+      padding: 7px 10px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 999px;
+      color: rgba(255,255,255,.72);
+      background: rgba(255,255,255,.07);
+      font-size: .78rem;
+      font-weight: 750;
+    }
+    .timer-core { display: grid; flex: 1; place-items: center; padding: 22px 28px; text-align: center; }
+    .timer-core-inner { width: 100%; }
+    .current-kicker { margin: 0 0 7px; color: var(--lime); font-size: .78rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+    .current-task {
+      min-height: 70px;
+      margin: 0 auto 26px;
+      max-width: 430px;
+      font-size: clamp(1.4rem, 4vw, 2.15rem);
+      line-height: 1.22;
+      letter-spacing: -.035em;
+    }
+
+    .clock {
+      --progress: 0deg;
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: min(285px, 74vw);
+      aspect-ratio: 1;
+      margin: 0 auto 28px;
+      border-radius: 50%;
+      background: conic-gradient(var(--lime) var(--progress), rgba(255,255,255,.12) 0);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 26px 60px rgba(0,0,0,.24);
+    }
+    .clock::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: inherit;
+      background: var(--timer-face);
+    }
+    .clock-content { position: relative; z-index: 1; }
+    .time-display { display: block; font-size: clamp(3.1rem, 8vw, 4.55rem); font-weight: 840; letter-spacing: -.07em; line-height: 1; font-variant-numeric: tabular-nums; }
+    .clock-caption { display: block; margin-top: 10px; color: rgba(255,255,255,.58); font-size: .8rem; font-weight: 700; }
+
+    .timer-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .timer-actions .btn { min-width: 132px; }
+    .timer-actions .btn-primary { min-width: 168px; }
+    .timer-hint { min-height: 24px; margin: 14px 0 0; color: rgba(255,255,255,.54); font-size: .82rem; }
+
+    .timer-footer {
+      margin: 0 20px 20px;
+      padding: 18px 20px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px;
+      background: rgba(255,255,255,.07);
+    }
+    .progress-meta { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 9px; color: rgba(255,255,255,.7); font-size: .8rem; font-weight: 700; }
+    .progress-track { height: 8px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.12); }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: var(--lime); transition: width .3s ease; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(14, 14, 35, .66);
+      backdrop-filter: blur(9px);
+    }
+    .modal-backdrop[hidden] { display: none; }
+    .modal {
+      width: min(440px, 100%);
+      padding: 30px;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 28px;
+      color: var(--text);
+      background: var(--panel);
+      box-shadow: 0 30px 90px rgba(0,0,0,.28);
+      text-align: center;
+      animation: modal-in .24s ease-out;
+    }
+    .modal-icon {
+      display: grid;
+      place-items: center;
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 16px;
+      border-radius: 22px;
+      color: var(--ink);
+      background: var(--lime);
+      font-size: 2rem;
+      transform: rotate(-4deg);
+    }
+    .modal h2 { margin: 0 0 8px; font-size: 1.7rem; letter-spacing: -.035em; }
+    .modal p { margin: 0 0 20px; color: var(--muted); }
+    .score { display: block; margin: 4px 0; color: var(--blue); font-size: 4.3rem; font-weight: 900; line-height: 1; letter-spacing: -.07em; }
+    .modal .btn { width: 100%; }
+    .modal .btn[hidden] { display: none; }
+    .modal-actions { display: grid; gap: 10px; }
+    .modal-actions[hidden] { display: none; }
+    .modal-actions .btn-secondary { color: var(--text); background: var(--surface-muted); }
+    .modal-actions .btn-outline { color: var(--text); border: 1px solid var(--line); background: var(--surface); }
+
+    .calendar-panel { grid-column: 1 / -1; padding: 28px; }
+    .calendar-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr); gap: 24px; }
+    .calendar-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .calendar-toolbar h2 { margin: 0; font-size: 1.35rem; }
+    .calendar-nav { display: flex; gap: 8px; }
+    .calendar-nav .icon-btn { color: var(--text); background: var(--surface-soft); }
+    .weekday-row, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px; }
+    .weekday-row { margin-bottom: 7px; color: var(--muted); font-size: .72rem; font-weight: 800; text-align: center; }
+    .calendar-day {
+      position: relative;
+      min-height: 62px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      color: var(--text);
+      background: var(--surface);
+      text-align: left;
+      cursor: pointer;
+    }
+    .calendar-day:hover { border-color: #bfc0ed; }
+    .calendar-day.is-outside { color: #aaaabd; background: #f8f8fb; }
+    .calendar-day.is-today { box-shadow: inset 0 0 0 2px var(--lime-dark); }
+    .calendar-day.is-selected { color: var(--on-ink); border-color: var(--ink); background: var(--ink); }
+    .day-number { font-weight: 850; }
+    .day-count { display: block; margin-top: 9px; color: var(--blue); font-size: .68rem; font-weight: 850; }
+    .calendar-day.is-selected .day-count { color: var(--lime); }
+    .history-panel { min-height: 300px; padding: 20px; border-radius: 20px; background: var(--surface-soft); }
+    .history-panel h3 { margin: 0 0 4px; font-size: 1.05rem; }
+    .history-summary { margin: 0 0 15px; color: var(--muted); font-size: .82rem; }
+    .history-list { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+    .history-item { padding: 11px 12px; border-radius: 13px; background: var(--surface); }
+    .history-item strong { display: block; overflow-wrap: anywhere; }
+    .history-item time { color: var(--muted); font-size: .72rem; }
+    .history-empty { padding: 34px 12px; color: var(--muted); text-align: center; }
+
+    .app-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 22px 4px 0;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+    .footer-copy { margin: 0; }
+    .footer-copy span { display: block; margin-top: 2px; }
+    .footer-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .footer-button {
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--text);
+      background: var(--surface);
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .footer-button:hover { border-color: var(--blue); }
+    .privacy-modal { width: min(560px, 100%); text-align: left; }
+    .privacy-modal h2 { padding-right: 42px; }
+    .privacy-modal ul { margin: 0 0 22px; padding-left: 1.25rem; color: var(--muted); }
+    .privacy-modal li + li { margin-top: 8px; }
+    .privacy-modal .modal-actions { grid-template-columns: 1fr; }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 40;
+      max-width: min(360px, calc(100% - 44px));
+      padding: 13px 16px;
+      border-radius: 14px;
+      color: var(--on-ink);
+      background: var(--ink);
+      box-shadow: 0 12px 36px rgba(23,23,53,.25);
+      font-size: .88rem;
+      font-weight: 700;
+      animation: toast-in .2s ease-out;
+    }
+    .toast[hidden] { display: none; }
+
+    @keyframes modal-in { from { opacity: 0; transform: translateY(12px) scale(.97); } }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+
+    @media (max-width: 860px) {
+      .workspace { grid-template-columns: 1fr; }
+      .timer-panel { min-height: 630px; }
+      .calendar-layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .app-shell { width: min(100% - 20px, 1180px); padding-top: 16px; }
+      .topbar { align-items: flex-start; }
+      .brand p { display: none; }
+      .local-pill { padding: 7px 9px; font-size: .72rem; }
+      .topbar-actions { gap: 7px; }
+      .language-switcher { padding: 6px 8px; }
+      .setup-panel { padding: 20px; }
+      .calendar-panel { padding: 20px; }
+      .calendar-day { min-height: 49px; padding: 6px; }
+      .day-count { margin-top: 5px; font-size: .62rem; }
+      .task-form { align-items: stretch; }
+      .task-form .btn { padding: 0 14px; }
+      .task-item { grid-template-columns: 32px minmax(0, 1fr) 36px; }
+      .duration-badge { grid-column: 2; justify-self: start; margin-top: -4px; }
+      .task-item .icon-btn { grid-column: 3; grid-row: 1 / span 2; }
+      .timer-top { padding: 22px 20px 0; }
+      .timer-core { padding-inline: 20px; }
+      .timer-actions { flex-direction: column; }
+      .timer-actions .btn { width: 100%; }
+      .current-task { min-height: 60px; }
+      .app-footer { align-items: stretch; flex-direction: column; }
+      .footer-actions { justify-content: flex-start; }
+      .footer-button { flex: 1 1 auto; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2h12v4c0 4-3 6-5 7 2 1 5 3 5 7v2H6v-2c0-4 3-6 5-7-2-1-5-3-5-7V2Z" />
+            <path d="M8 5h8M8 19h8" />
+          </svg>
+        </div>
+        <div>
+          <h1 data-i18n="app.name"></h1>
+          <p data-i18n="app.slogan"></p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div class="language-switcher" id="languageSwitcher" role="group" data-i18n-aria-label="language.selectorLabel">
+          <span class="language-icon" aria-hidden="true">🌐</span>
+        </div>
+        <div class="local-pill" data-i18n="app.localVersion"></div>
+      </div>
+    </header>
+
+    <section class="workspace" data-i18n-aria-label="app.workspaceLabel">
+      <section class="panel setup-panel" aria-labelledby="task-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow" data-i18n="tasks.step"></p>
+            <h2 id="task-heading" data-i18n="tasks.heading"></h2>
+          </div>
+          <span class="task-count" id="taskCount">0</span>
+        </div>
+
+        <form class="task-form" id="taskForm">
+          <input class="text-input" id="taskInput" maxlength="80" autocomplete="off" data-i18n-placeholder="tasks.placeholder" data-i18n-aria-label="tasks.inputLabel">
+          <button class="btn btn-dark" type="submit" data-i18n="tasks.add"></button>
+        </form>
+
+        <ul class="task-list" id="taskList" aria-live="polite"></ul>
+        <div class="task-list-actions">
+          <button class="btn clear-tasks-button" id="clearTasksButton" type="button" disabled data-i18n="tasks.clear"></button>
+        </div>
+
+        <section class="rule-card" aria-labelledby="rule-heading">
+          <p class="rule-title" id="rule-heading" data-i18n="settings.durationQuestion"></p>
+          <div class="range-row">
+            <div class="field">
+              <label for="minMinutes" data-i18n="settings.minimum"></label>
+              <input class="number-input" id="minMinutes" type="number" min="1" max="180" value="15" inputmode="numeric">
+            </div>
+            <span class="range-divider" aria-hidden="true">—</span>
+            <div class="field">
+              <label for="maxMinutes" data-i18n="settings.maximum"></label>
+              <input class="number-input" id="maxMinutes" type="number" min="1" max="180" value="60" inputmode="numeric">
+            </div>
+          </div>
+          <p class="validation" id="validation" role="alert"></p>
+          <div class="toggle-row">
+            <div class="toggle-copy">
+              <strong data-i18n="settings.warmupTitle"></strong>
+              <span data-i18n="settings.warmupDescription"></span>
+            </div>
+            <label class="switch" data-i18n-aria-label="settings.warmupLabel">
+              <input id="warmupToggle" type="checkbox">
+              <span class="switch-track" aria-hidden="true"></span>
+            </label>
+          </div>
+          <button class="btn btn-primary draw-btn" id="drawButton" type="button" disabled></button>
+        </section>
+      </section>
+
+      <section class="panel timer-panel" aria-labelledby="currentTask">
+        <div class="timer-top">
+          <span class="round-label" data-i18n="timer.currentRound"></span>
+          <span class="round-chip" id="roundChip"></span>
+        </div>
+
+        <div class="timer-core">
+          <div class="timer-core-inner">
+            <p class="current-kicker" id="currentKicker"></p>
+            <h2 class="current-task" id="currentTask"></h2>
+
+            <div class="clock" id="clock" role="timer" aria-live="off">
+              <div class="clock-content">
+                <span class="time-display" id="timeDisplay">00:00</span>
+                <span class="clock-caption" id="clockCaption"></span>
+              </div>
+            </div>
+
+            <div class="timer-actions">
+              <button class="btn btn-primary" id="startPauseButton" type="button" disabled></button>
+              <button class="btn btn-ghost" id="completeButton" type="button" disabled data-i18n="timer.completeEarly"></button>
+              <button class="btn btn-ghost" id="skipButton" type="button" disabled data-i18n="timer.skip"></button>
+            </div>
+            <p class="timer-hint" id="timerHint"></p>
+          </div>
+        </div>
+
+        <div class="timer-footer">
+          <div class="progress-meta">
+            <span data-i18n="timer.progress"></span>
+            <span id="progressText">0 / 0</span>
+          </div>
+          <div class="progress-track" role="progressbar" id="progressTrack" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel calendar-panel" aria-labelledby="calendarHeading">
+        <div class="calendar-layout">
+          <div>
+            <div class="calendar-toolbar">
+              <div>
+                <p class="eyebrow" data-i18n="calendar.eyebrow"></p>
+                <h2 id="calendarHeading"></h2>
+              </div>
+              <div class="calendar-nav">
+                <button class="icon-btn" id="previousMonthButton" type="button" data-i18n-aria-label="calendar.previousMonth">←</button>
+                <button class="icon-btn" id="nextMonthButton" type="button" data-i18n-aria-label="calendar.nextMonth">→</button>
+              </div>
+            </div>
+            <div class="weekday-row" id="weekdayRow" aria-hidden="true"></div>
+            <div class="calendar-grid" id="calendarGrid" data-i18n-aria-label="calendar.gridLabel"></div>
+          </div>
+          <aside class="history-panel" aria-live="polite">
+            <h3 id="historyDate"></h3>
+            <p class="history-summary" id="historySummary"></p>
+            <ul class="history-list" id="historyList"></ul>
+          </aside>
+        </div>
+      </section>
+    </section>
+
+    <footer class="app-footer">
+      <p class="footer-copy"><span data-i18n="footer.copyright"></span><span data-i18n="footer.tagline"></span></p>
+      <div class="footer-actions" data-i18n-aria-label="footer.actionsLabel">
+        <button class="footer-button" id="privacyButton" type="button" data-i18n="footer.privacy"></button>
+        <button class="footer-button" id="exportButton" type="button" data-i18n="footer.export"></button>
+        <button class="footer-button" id="importButton" type="button" data-i18n="footer.import"></button>
+        <input id="importFileInput" type="file" accept="application/json,.json" hidden>
+      </div>
+    </footer>
+  </main>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalMessage">
+      <div class="modal-icon" id="modalIcon" aria-hidden="true">✓</div>
+      <h2 id="modalTitle"></h2>
+      <p id="modalMessage"></p>
+      <div id="scoreWrap" hidden>
+        <span class="score" id="scoreValue">200</span>
+        <p data-i18n="modal.rewardPoints"></p>
+      </div>
+      <div class="modal-actions" id="decisionActions" hidden>
+        <button class="btn btn-dark" id="markCompletedButton" type="button" data-i18n="modal.completed"></button>
+        <button class="btn btn-secondary" id="requeueButton" type="button" data-i18n="modal.returnQueue"></button>
+        <button class="btn btn-outline" id="extendButton" type="button" data-i18n="modal.focusMore"></button>
+      </div>
+      <div class="modal-actions" id="warmupActions" hidden>
+        <button class="btn btn-dark" id="startFullTaskButton" type="button" data-i18n="modal.startFull"></button>
+        <button class="btn btn-secondary" id="returnFromWarmupButton" type="button" data-i18n="modal.returnWarmup"></button>
+      </div>
+      <button class="btn btn-dark" id="modalButton" type="button"></button>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="privacyBackdrop" hidden>
+    <section class="modal privacy-modal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+      <div class="modal-icon" aria-hidden="true">⌂</div>
+      <h2 id="privacyTitle" data-i18n="privacy.title"></h2>
+      <ul>
+        <li data-i18n="privacy.noAccount"></li>
+        <li data-i18n="privacy.localStorage"></li>
+        <li data-i18n="privacy.noUpload"></li>
+        <li data-i18n="privacy.backup"></li>
+        <li data-i18n="privacy.futureSync"></li>
+      </ul>
+      <div class="modal-actions">
+        <button class="btn btn-dark" id="privacyCloseButton" type="button" data-i18n="privacy.close"></button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const LANGUAGE_KEY = "dopadrawLanguage";
+      const translations = {
+        zh: {
+          _meta: { htmlLang: "zh-CN", locale: "zh-CN", label: "中文" },
+          app: {
+            name: "DopaDraw",
+            slogan: "少做一个决定，先做眼前这一件。",
+            description: "一个本地运行的随机专注计时器：添加任务、抽取时长，然后一次只做一件事。",
+            localVersion: "v0.7 · 本地运行",
+            workspaceLabel: "随机专注计时器"
+          },
+          language: { selectorLabel: "选择语言" },
+          tasks: {
+            step: "第 01 步",
+            heading: "今天做什么？",
+            placeholder: "写下一件具体的小事…",
+            inputLabel: "新任务名称",
+            add: "添加",
+            clear: "新的一天 · 清空清单",
+            count: { other: "{count} 个任务" },
+            emptyTitle: "先放进一件事",
+            emptyBody: "写具体一点，会更容易开始",
+            completed: "已完成",
+            warmupStatus: "三分钟启动中",
+            activeMinutes: "进行中 · {minutes} 分钟",
+            pendingMinutes: "待抽取 · {minutes} 分钟",
+            pending: "待抽取",
+            deleteLabel: "删除任务：{name}"
+          },
+          settings: {
+            durationQuestion: "每项随机做多久？",
+            minimum: "最短（分钟）",
+            maximum: "最长（分钟）",
+            warmupTitle: "三分钟启动",
+            warmupDescription: "先用 3 分钟降低启动门槛",
+            warmupLabel: "开启三分钟启动"
+          },
+          validation: {
+            integerRange: "请输入 1–180 之间的整数。",
+            minimumGreater: "最短时间不能大于最长时间。"
+          },
+          timer: {
+            currentRound: "当前一轮",
+            progress: "本轮进度",
+            roundResume: "本轮待继续",
+            roundDraw: "等待抽取",
+            roundWaiting: "等待任务",
+            roundPending: "待完成 {count} 项",
+            kickerReady: "准备区",
+            kickerWarmup: "三分钟启动",
+            kickerFocusing: "正在专注",
+            kickerTurn: "轮到这件事",
+            taskResume: "清单已恢复，准备好后继续本轮",
+            taskAllDone: "本轮任务已经全部完成",
+            taskReady: "任务已就位，现在生成本轮",
+            taskEmpty: "添加任务后，生成你的第一轮",
+            captionReady: "等你发令",
+            captionWarmup: "先开始，不求做完",
+            captionFocusing: "保持当下",
+            captionPaused: "准备好再开始",
+            hintResume: "点击左侧的“继续本轮”，不会自动恢复旧倒计时",
+            hintAllDone: "完成状态会一直保留，直到你主动清空清单",
+            hintReady: "点击左侧的“生成本轮”",
+            hintEmpty: "先在左边添加至少一项任务",
+            hintWarmup: "完成 3 分钟后，再决定是否进入正式计时",
+            hintRunning: "页面切到后台也会按真实时间校准",
+            hintDuration: "这一项抽到了 {minutes} 分钟",
+            start: "开始",
+            pause: "暂停",
+            resume: "继续",
+            startWarmup: "开始 3 分钟",
+            completeEarly: "提前完成",
+            skip: "先跳过",
+            draw: "生成本轮",
+            resumeRound: "继续本轮",
+            remainingLabel: "剩余时间 {time}",
+            notStartedLabel: "尚未开始计时"
+          },
+          calendar: {
+            eyebrow: "记录",
+            title: "完成日历",
+            previousMonth: "上个月",
+            nextMonth: "下个月",
+            gridLabel: "完成记录日历",
+            weekdays: ["一", "二", "三", "四", "五", "六", "日"],
+            today: "今天",
+            completedCount: { other: "完成了 {count} 项任务" },
+            noRecords: "还没有完成记录",
+            completedAt: "{time} 完成",
+            emptyDetail: "完成任务后，记录会出现在这里",
+            monthHeading: "{year} 年 {month}",
+            dayLabel: "{month} {day} 日，完成 {count} 项",
+            dayCount: "{count} 项完成"
+          },
+          footer: {
+            copyright: "© 2026 Yunt Shen。保留所有权利。",
+            tagline: "为开始而做，不为评判。",
+            actionsLabel: "数据与隐私",
+            privacy: "隐私说明",
+            export: "导出数据",
+            import: "导入数据"
+          },
+          privacy: {
+            title: "隐私说明",
+            noAccount: "当前版本默认不需要登录。",
+            localStorage: "任务清单、完成历史和使用偏好仅保存在当前浏览器的 localStorage 中。",
+            noUpload: "本页面不会把你的任务内容上传到服务器。",
+            backup: "如果清除浏览器数据，任务和记录可能丢失；你可以使用“导出数据”自行备份。",
+            futureSync: "未来如加入账号同步，会另行说明，并由你自主选择是否启用。",
+            close: "我知道了"
+          },
+          modal: {
+            rewardPoints: "本轮奖励分",
+            completed: "已完成",
+            returnQueue: "放回下一轮",
+            focusMore: "再坚持 5 分钟",
+            startFull: "进入正式计时",
+            returnWarmup: "暂时放回任务池",
+            decisionTitle: "完成了吗？",
+            decisionMessage: "“{task}”的计时结束了。按真实进度选择就好。",
+            warmupTitle: "启动完成，要正式开始吗？",
+            warmupMessage: "你已经为“{task}”启动了 3 分钟。可以进入正式计时，也可以先放回任务池。",
+            requeuedTitle: "已放回任务池",
+            earlyTitle: "漂亮，提前完成",
+            completedTitle: "已经完成一项",
+            requeuedMessage: "“{done}”会在之后再次参与抽取。下一项：{next}",
+            completedMessage: "“{done}”已完成。下一项：{next}",
+            viewNext: "查看下一项",
+            allDoneTitle: "本轮全部完成！",
+            allDoneMessage: "你把混乱一件件处理掉了。",
+            collectReward: "收下奖励"
+          },
+          confirm: {
+            importOverwrite: "导入会覆盖当前任务清单、完成历史和偏好设置，是否继续？",
+            clearTasks: "清空当前任务清单并开始新的一天？完成日历会继续保留。"
+          },
+          toast: {
+            recoveredActive: "刷新前进行中的任务已安全放回待抽取池",
+            recoveredList: "已恢复上次的任务清单",
+            tasksSaveFailed: "任务清单暂时无法保存到浏览器",
+            historySaveFailed: "完成记录暂时无法保存到浏览器",
+            exported: "备份已导出，请妥善保存 JSON 文件",
+            exportFailed: "导出失败，请稍后再试",
+            importTooLarge: "导入失败：备份文件不能超过 2 MB",
+            imported: "导入成功：任务、历史和偏好已恢复",
+            importInvalid: "导入失败：这不是有效的 DopaDraw 备份",
+            enterTask: "先写下任务名称吧",
+            fixRange: "先修正随机时间范围，才能给新任务抽取时长",
+            addedWithDuration: "新任务已加入待抽取池：{minutes} 分钟",
+            added: "任务已加入清单",
+            deletedActive: "当前任务已删除，可继续抽取下一项",
+            deleted: "任务已删除",
+            cleared: "当前清单已清空，完成历史仍然保留",
+            sessionResumed: "本轮已恢复，倒计时等待你手动开始",
+            sessionGenerated: "本轮已生成，第一项已随机抽出",
+            skippedNext: "已跳过“{task}”，下一项等待你开始",
+            skippedOnly: "目前只剩这一项，已留在任务池，稍后可以继续",
+            rangeRetained: "时间范围暂时无效，已保留这项原来的时长",
+            focusMore: "继续专注 5 分钟，加油",
+            fullTimerStarted: "正式计时开始：{minutes} 分钟",
+            warmupEnabled: "三分钟启动已开启，将从下一项开始生效",
+            warmupDisabled: "三分钟启动已关闭，将从下一项开始生效"
+          },
+          notification: {
+            warmupTitle: "三分钟完成！",
+            warmupBody: "要进入“{task}”的正式计时吗？",
+            timeUpTitle: "时间到！",
+            timeUpBody: "“{task}”完成了吗？",
+            allDoneTitle: "全部完成！",
+            allDoneBody: "你获得了 {score} 分"
+          }
+        },
+        en: {
+          _meta: { htmlLang: "en", locale: "en-US", label: "English" },
+          app: {
+            name: "DopaDraw",
+            slogan: "Stop deciding. Start doing.",
+            description: "A local-first random focus timer. Add tasks, draw a duration, and do one thing at a time.",
+            localVersion: "v0.7 · Local-first",
+            workspaceLabel: "Random focus timer"
+          },
+          language: { selectorLabel: "Choose language" },
+          tasks: {
+            step: "Step 01",
+            heading: "What's on your list?",
+            placeholder: "What's one small thing you can do next?",
+            inputLabel: "New task name",
+            add: "Add",
+            clear: "New Day · Clear Current List",
+            count: { one: "{count} task", other: "{count} tasks" },
+            emptyTitle: "Add one small task",
+            emptyBody: "Specific tasks are easier to start.",
+            completed: "Completed",
+            warmupStatus: "3-minute warm-up",
+            activeMinutes: "In progress · {minutes} min",
+            pendingMinutes: "Queued · {minutes} min",
+            pending: "Queued",
+            deleteLabel: "Delete task: {name}"
+          },
+          settings: {
+            durationQuestion: "How long should each task take?",
+            minimum: "Minimum (minutes)",
+            maximum: "Maximum (minutes)",
+            warmupTitle: "3-Minute Warm-up",
+            warmupDescription: "Lower the barrier with a quick start",
+            warmupLabel: "Enable the 3-minute warm-up"
+          },
+          validation: {
+            integerRange: "Enter whole numbers from 1 to 180.",
+            minimumGreater: "Minimum time can't exceed maximum time."
+          },
+          timer: {
+            currentRound: "Current Round",
+            progress: "Round Progress",
+            roundResume: "Ready to resume",
+            roundDraw: "Ready to draw",
+            roundWaiting: "Waiting for tasks",
+            roundPending: "{count} left",
+            kickerReady: "Ready",
+            kickerWarmup: "3-Minute Warm-up",
+            kickerFocusing: "In focus",
+            kickerTurn: "Up next",
+            taskResume: "Your list is back. Resume when you're ready.",
+            taskAllDone: "Every task in this round is complete.",
+            taskReady: "Your tasks are ready. Draw the first one.",
+            taskEmpty: "Add a task to start your first round.",
+            captionReady: "Whenever you're ready",
+            captionWarmup: "Just begin. Finishing can wait.",
+            captionFocusing: "Stay with this",
+            captionPaused: "Start when you're ready",
+            hintResume: "Select “Resume Round” on the left. The old countdown won't restart automatically.",
+            hintAllDone: "Completed tasks stay here until you clear the list.",
+            hintReady: "Select “Draw This Round” on the left.",
+            hintEmpty: "Add at least one task on the left.",
+            hintWarmup: "After 3 minutes, choose whether to continue with the full timer.",
+            hintRunning: "The timer stays accurate when this page is in the background.",
+            hintDuration: "This task drew {minutes} minutes.",
+            start: "Start",
+            pause: "Pause",
+            resume: "Resume",
+            startWarmup: "Start 3 Minutes",
+            completeEarly: "Complete Early",
+            skip: "Skip for now",
+            draw: "Draw This Round",
+            resumeRound: "Resume Round",
+            remainingLabel: "Time remaining: {time}",
+            notStartedLabel: "Timer has not started"
+          },
+          calendar: {
+            eyebrow: "History",
+            title: "Activity Calendar",
+            previousMonth: "Previous month",
+            nextMonth: "Next month",
+            gridLabel: "Task completion calendar",
+            weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            today: "Today",
+            completedCount: { one: "{count} task completed", other: "{count} tasks completed" },
+            noRecords: "No completed tasks yet",
+            completedAt: "Completed at {time}",
+            emptyDetail: "Completed tasks will appear here.",
+            monthHeading: "{month} {year}",
+            dayLabel: "{month} {day}: {count} completed",
+            dayCount: "{count} done"
+          },
+          footer: {
+            copyright: "© 2026 Yunt Shen. All rights reserved.",
+            tagline: "Made for starting, not judging.",
+            actionsLabel: "Data and privacy",
+            privacy: "Privacy",
+            export: "Export Data",
+            import: "Import Data"
+          },
+          privacy: {
+            title: "Privacy",
+            noAccount: "No account is required for this version.",
+            localStorage: "Your task list, activity history, and preferences stay in this browser's local storage.",
+            noUpload: "DopaDraw does not upload your task content to a server.",
+            backup: "Clearing browser data may erase your tasks and history. Use Export Data to keep a backup.",
+            futureSync: "If optional account sync is added later, it will be clearly explained and remain your choice.",
+            close: "Got it"
+          },
+          modal: {
+            rewardPoints: "Round Reward",
+            completed: "Completed",
+            returnQueue: "Return to Queue",
+            focusMore: "Focus 5 More Minutes",
+            startFull: "Start Full Timer",
+            returnWarmup: "Return to Queue",
+            decisionTitle: "Did you finish this task?",
+            decisionMessage: "Time is up for “{task}”. Choose what matches your actual progress.",
+            warmupTitle: "Warm-up done. Keep going?",
+            warmupMessage: "You spent 3 minutes getting started on “{task}”. Continue with the full timer or return it to the queue.",
+            requeuedTitle: "Returned to the queue",
+            earlyTitle: "Nice — finished early",
+            completedTitle: "Task completed",
+            requeuedMessage: "“{done}” will come up again later. Next: {next}",
+            completedMessage: "“{done}” is complete. Next: {next}",
+            viewNext: "See Next Task",
+            allDoneTitle: "Round complete!",
+            allDoneMessage: "You worked through the list one task at a time.",
+            collectReward: "Collect Reward"
+          },
+          confirm: {
+            importOverwrite: "Importing will replace your current tasks, activity history, and timer settings. Continue?",
+            clearTasks: "Clear the current task list and start a new day? Your activity calendar will be kept."
+          },
+          toast: {
+            recoveredActive: "The active task was safely returned to the queue after the page reload.",
+            recoveredList: "Your previous task list has been restored.",
+            tasksSaveFailed: "Your task list couldn't be saved in this browser.",
+            historySaveFailed: "Your activity history couldn't be saved in this browser.",
+            exported: "Backup exported. Keep the JSON file somewhere safe.",
+            exportFailed: "Export failed. Please try again.",
+            importTooLarge: "Import failed: the backup must be 2 MB or smaller.",
+            imported: "Import complete. Your tasks, history, and settings are restored.",
+            importInvalid: "Import failed: this isn't a valid DopaDraw backup.",
+            enterTask: "Add a task name first.",
+            fixRange: "Fix the time range before adding a task to this round.",
+            addedWithDuration: "Task added to the queue with a {minutes}-minute timer.",
+            added: "Task added.",
+            deletedActive: "Current task deleted. You can draw the next one.",
+            deleted: "Task deleted.",
+            cleared: "Current list cleared. Your activity history is still here.",
+            sessionResumed: "Round restored. Start the countdown when you're ready.",
+            sessionGenerated: "Round created. Your first task has been drawn.",
+            skippedNext: "Skipped “{task}”. The next task is ready.",
+            skippedOnly: "This is the only task left, so it remains in the queue for later.",
+            rangeRetained: "The time range is invalid, so this task kept its previous duration.",
+            focusMore: "Five more focus minutes. You've got this.",
+            fullTimerStarted: "Full timer started: {minutes} minutes.",
+            warmupEnabled: "3-minute warm-up enabled. It will apply to the next task.",
+            warmupDisabled: "3-minute warm-up disabled. The change applies to the next task."
+          },
+          notification: {
+            warmupTitle: "Warm-up complete!",
+            warmupBody: "Start the full timer for “{task}”?",
+            timeUpTitle: "Time's up!",
+            timeUpBody: "Did you finish “{task}”?",
+            allDoneTitle: "All done!",
+            allDoneBody: "You earned {score} points."
+          }
+        }
+      };
+
+      function getInitialLanguage() {
+        try {
+          const saved = localStorage.getItem(LANGUAGE_KEY);
+          if (saved && translations[saved]) return saved;
+        } catch (_) { /* use browser language */ }
+        const browserLanguage = String(navigator.language || "").toLowerCase();
+        const exactMatch = Object.keys(translations).find(code => code.toLowerCase() === browserLanguage);
+        const baseMatch = Object.keys(translations).find(code => code.toLowerCase() === browserLanguage.split("-")[0]);
+        return exactMatch || baseMatch || "en";
+      }
+
+      function translationValue(key) {
+        const read = language => key.split(".").reduce((value, part) => value && value[part], translations[language]);
+        return read(state.language) ?? read("en") ?? key;
+      }
+
+      function t(key, variables = {}) {
+        const value = translationValue(key);
+        if (typeof value !== "string") return value;
+        return value.replace(/\{(\w+)\}/g, (match, name) => Object.prototype.hasOwnProperty.call(variables, name) ? variables[name] : match);
+      }
+
+      function tp(key, count, variables = {}) {
+        const locale = translations[state.language]._meta.locale;
+        const category = new Intl.PluralRules(locale).select(count);
+        const localized = translationValue(`${key}.${category}`);
+        const value = typeof localized === "string" && localized !== `${key}.${category}`
+          ? localized
+          : translationValue(`${key}.other`);
+        return value.replace(/\{(\w+)\}/g, (match, name) => {
+          const values = { ...variables, count };
+          return Object.prototype.hasOwnProperty.call(values, name) ? values[name] : match;
+        });
+      }
+
+      const state = {
+        language: getInitialLanguage(),
+        tasks: [],
+        currentIndex: -1,
+        remainingSeconds: 0,
+        totalSeconds: 0,
+        endTime: null,
+        timerId: null,
+        isRunning: false,
+        sessionActive: false,
+        modalAction: null,
+        warmupActive: false,
+        history: [],
+        calendarMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+        selectedDate: "",
+        modalContext: null,
+        toastContext: null
+      };
+
+      const HISTORY_KEY = "focusLotteryHistoryV1";
+      const PREFERENCES_KEY = "focusLotteryPreferencesV1";
+      const TASKS_KEY = "focusLotteryTasksV1";
+      const BACKUP_VERSION = "0.7";
+
+      const els = {
+        description: document.querySelector('meta[name="description"]'),
+        languageSwitcher: document.querySelector("#languageSwitcher"),
+        taskForm: document.querySelector("#taskForm"),
+        taskInput: document.querySelector("#taskInput"),
+        taskList: document.querySelector("#taskList"),
+        taskCount: document.querySelector("#taskCount"),
+        clearTasksButton: document.querySelector("#clearTasksButton"),
+        minMinutes: document.querySelector("#minMinutes"),
+        maxMinutes: document.querySelector("#maxMinutes"),
+        validation: document.querySelector("#validation"),
+        warmupToggle: document.querySelector("#warmupToggle"),
+        drawButton: document.querySelector("#drawButton"),
+        roundChip: document.querySelector("#roundChip"),
+        currentKicker: document.querySelector("#currentKicker"),
+        currentTask: document.querySelector("#currentTask"),
+        clock: document.querySelector("#clock"),
+        timeDisplay: document.querySelector("#timeDisplay"),
+        clockCaption: document.querySelector("#clockCaption"),
+        startPauseButton: document.querySelector("#startPauseButton"),
+        completeButton: document.querySelector("#completeButton"),
+        skipButton: document.querySelector("#skipButton"),
+        timerHint: document.querySelector("#timerHint"),
+        progressText: document.querySelector("#progressText"),
+        progressTrack: document.querySelector("#progressTrack"),
+        progressFill: document.querySelector("#progressFill"),
+        modalBackdrop: document.querySelector("#modalBackdrop"),
+        modalIcon: document.querySelector("#modalIcon"),
+        modalTitle: document.querySelector("#modalTitle"),
+        modalMessage: document.querySelector("#modalMessage"),
+        scoreWrap: document.querySelector("#scoreWrap"),
+        scoreValue: document.querySelector("#scoreValue"),
+        decisionActions: document.querySelector("#decisionActions"),
+        warmupActions: document.querySelector("#warmupActions"),
+        markCompletedButton: document.querySelector("#markCompletedButton"),
+        requeueButton: document.querySelector("#requeueButton"),
+        extendButton: document.querySelector("#extendButton"),
+        startFullTaskButton: document.querySelector("#startFullTaskButton"),
+        returnFromWarmupButton: document.querySelector("#returnFromWarmupButton"),
+        modalButton: document.querySelector("#modalButton"),
+        calendarHeading: document.querySelector("#calendarHeading"),
+        weekdayRow: document.querySelector("#weekdayRow"),
+        calendarGrid: document.querySelector("#calendarGrid"),
+        previousMonthButton: document.querySelector("#previousMonthButton"),
+        nextMonthButton: document.querySelector("#nextMonthButton"),
+        historyDate: document.querySelector("#historyDate"),
+        historySummary: document.querySelector("#historySummary"),
+        historyList: document.querySelector("#historyList"),
+        privacyButton: document.querySelector("#privacyButton"),
+        privacyBackdrop: document.querySelector("#privacyBackdrop"),
+        privacyCloseButton: document.querySelector("#privacyCloseButton"),
+        exportButton: document.querySelector("#exportButton"),
+        importButton: document.querySelector("#importButton"),
+        importFileInput: document.querySelector("#importFileInput"),
+        toast: document.querySelector("#toast")
+      };
+
+      let toastTimer = null;
+      let audioContext = null;
+
+      function renderTranslatedAttributes() {
+        document.querySelectorAll("[data-i18n]").forEach(element => {
+          element.textContent = t(element.dataset.i18n);
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach(element => {
+          element.placeholder = t(element.dataset.i18nPlaceholder);
+        });
+        document.querySelectorAll("[data-i18n-aria-label]").forEach(element => {
+          element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+        });
+      }
+
+      function renderLanguageSwitcher() {
+        const options = Object.entries(translations).map(([code, dictionary]) => `
+          <button class="language-button" type="button" data-language="${escapeHtml(code)}" aria-pressed="${code === state.language}">${escapeHtml(dictionary._meta.label)}</button>
+        `.trim());
+        els.languageSwitcher.innerHTML = `<span class="language-icon" aria-hidden="true">🌐</span>${options.join('<span class="language-divider" aria-hidden="true">|</span>')}`;
+        els.languageSwitcher.setAttribute("aria-label", t("language.selectorLabel"));
+      }
+
+      function translateUI() {
+        const meta = translations[state.language]._meta;
+        document.documentElement.lang = meta.htmlLang;
+        document.title = t("app.name");
+        els.description.content = t("app.description");
+        renderTranslatedAttributes();
+        renderLanguageSwitcher();
+        els.weekdayRow.innerHTML = t("calendar.weekdays").map(day => `<span>${escapeHtml(day)}</span>`).join("");
+      }
+
+      function setLanguage(language) {
+        state.language = translations[language] ? language : "en";
+        try { localStorage.setItem(LANGUAGE_KEY, state.language); } catch (_) { /* language still applies to this page */ }
+        translateUI();
+        els.validation.textContent = getRange().message;
+        renderTasks();
+        renderTimer();
+        renderCalendar();
+        renderOpenModal();
+        if (!els.toast.hidden && state.toastContext) {
+          els.toast.textContent = t(state.toastContext.key, state.toastContext.variables);
+        }
+      }
+
+      function createId() {
+        return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      function clampInteger(value, min, max) {
+        const parsed = Number.parseInt(value, 10);
+        if (!Number.isFinite(parsed)) return null;
+        return Math.min(max, Math.max(min, parsed));
+      }
+
+      function randomInteger(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function getRange() {
+        const min = clampInteger(els.minMinutes.value, 1, 180);
+        const max = clampInteger(els.maxMinutes.value, 1, 180);
+        if (min === null || max === null) return { valid: false, message: t("validation.integerRange") };
+        if (min > max) return { valid: false, message: t("validation.minimumGreater") };
+        return { valid: true, min, max, message: "" };
+      }
+
+      function showToast(key, variables = {}) {
+        clearTimeout(toastTimer);
+        state.toastContext = { key, variables };
+        els.toast.textContent = t(key, variables);
+        els.toast.hidden = false;
+        toastTimer = setTimeout(() => {
+          els.toast.hidden = true;
+          state.toastContext = null;
+        }, 2800);
+      }
+
+      function currentPreferences() {
+        const range = getRange();
+        return {
+          warmupEnabled: els.warmupToggle.checked,
+          minMinutes: range.valid ? range.min : 15,
+          maxMinutes: range.valid ? range.max : 60
+        };
+      }
+
+      function escapeHtml(value) {
+        return value.replace(/[&<>"']/g, character => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          "\"": "&quot;",
+          "'": "&#039;"
+        })[character]);
+      }
+
+      function localDateKey(date = new Date()) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function loadTasks() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(TASKS_KEY) || "null");
+          const savedTasks = Array.isArray(saved) ? saved : saved && Array.isArray(saved.tasks) ? saved.tasks : [];
+          let recoveredActiveTask = false;
+
+          state.tasks = savedTasks.reduce((tasks, task) => {
+            if (!task || typeof task.name !== "string" || !task.name.trim()) return tasks;
+            const savedStatus = ["pending", "active", "completed"].includes(task.status)
+              ? task.status
+              : task.done ? "completed" : "pending";
+            if (savedStatus === "active") recoveredActiveTask = true;
+            const parsedMinutes = Number.parseInt(task.minutes, 10);
+            tasks.push({
+              id: typeof task.id === "string" && task.id ? task.id : createId(),
+              name: task.name.trim().slice(0, 80),
+              minutes: Number.isFinite(parsedMinutes) && parsedMinutes >= 1 && parsedMinutes <= 180 ? parsedMinutes : null,
+              status: savedStatus === "active" ? "pending" : savedStatus
+            });
+            return tasks;
+          }, []);
+
+          const savedSessionActive = !Array.isArray(saved) && Boolean(saved && saved.sessionActive);
+          const hasPendingTasks = state.tasks.some(task => task.status === "pending");
+          const pendingTasksHaveMinutes = state.tasks
+            .filter(task => task.status === "pending")
+            .every(task => task.minutes !== null);
+          state.sessionActive = (savedSessionActive || recoveredActiveTask) && hasPendingTasks && pendingTasksHaveMinutes;
+          state.currentIndex = -1;
+          state.remainingSeconds = 0;
+          state.totalSeconds = 0;
+          state.endTime = null;
+          state.isRunning = false;
+          state.warmupActive = false;
+          if (saved) saveTasks();
+
+          if (recoveredActiveTask) return { key: "toast.recoveredActive" };
+          if (state.tasks.length) return { key: "toast.recoveredList" };
+        } catch (_) {
+          state.tasks = [];
+          state.sessionActive = false;
+        }
+        return null;
+      }
+
+      function saveTasks() {
+        try {
+          localStorage.setItem(TASKS_KEY, JSON.stringify({
+            version: 1,
+            tasks: state.tasks,
+            sessionActive: state.sessionActive,
+            savedAt: new Date().toISOString()
+          }));
+        } catch (_) {
+          showToast("toast.tasksSaveFailed");
+        }
+      }
+
+      function loadLocalData() {
+        const recoveryMessage = loadTasks();
+        try {
+          const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+          state.history = Array.isArray(history) ? history.filter(item => item && item.taskName && item.completedAt) : [];
+        } catch (_) {
+          state.history = [];
+        }
+        try {
+          const preferences = JSON.parse(localStorage.getItem(PREFERENCES_KEY) || "{}");
+          els.warmupToggle.checked = Boolean(preferences.warmupEnabled);
+          const minMinutes = clampInteger(preferences.minMinutes, 1, 180);
+          const maxMinutes = clampInteger(preferences.maxMinutes, 1, 180);
+          if (minMinutes !== null && maxMinutes !== null && minMinutes <= maxMinutes) {
+            els.minMinutes.value = minMinutes;
+            els.maxMinutes.value = maxMinutes;
+          }
+        } catch (_) {
+          els.warmupToggle.checked = false;
+        }
+        state.selectedDate = localDateKey();
+        return recoveryMessage;
+      }
+
+      function savePreferences() {
+        try {
+          localStorage.setItem(PREFERENCES_KEY, JSON.stringify(currentPreferences()));
+        } catch (_) { /* the switch still works for the current page */ }
+      }
+
+      function saveHistory() {
+        try {
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(state.history));
+        } catch (_) {
+          showToast("toast.historySaveFailed");
+        }
+      }
+
+      function exportData() {
+        const backup = {
+          version: BACKUP_VERSION,
+          exportedAt: new Date().toISOString(),
+          tasks: state.tasks.map(task => ({
+            id: task.id,
+            name: task.name,
+            minutes: task.minutes,
+            status: task.status
+          })),
+          history: state.history.map(item => ({
+            id: item.id,
+            taskName: item.taskName,
+            completedAt: item.completedAt
+          })),
+          preferences: currentPreferences()
+        };
+
+        try {
+          saveTasks();
+          saveHistory();
+          savePreferences();
+          const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `dopadraw-backup-${localDateKey()}.json`;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          showToast("toast.exported");
+        } catch (_) {
+          showToast("toast.exportFailed");
+        }
+      }
+
+      function validateBackup(data) {
+        if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("invalid-backup-object");
+        if (!(typeof data.version === "string" || typeof data.version === "number")) throw new Error("missing-version");
+        if (!Array.isArray(data.tasks) || !Array.isArray(data.history)) throw new Error("missing-data-arrays");
+        if (!data.preferences || typeof data.preferences !== "object" || Array.isArray(data.preferences)) throw new Error("missing-preferences");
+
+        const tasks = data.tasks.map(task => {
+          if (!task || typeof task !== "object" || typeof task.name !== "string" || !task.name.trim()) {
+            throw new Error("invalid-task");
+          }
+          const minutes = task.minutes === null || task.minutes === undefined || task.minutes === ""
+            ? null
+            : Number(task.minutes);
+          if (minutes !== null && (!Number.isInteger(minutes) || minutes < 1 || minutes > 180)) {
+            throw new Error("invalid-task-duration");
+          }
+          const status = ["pending", "active", "completed"].includes(task.status) ? task.status : "pending";
+          return {
+            id: typeof task.id === "string" && task.id ? task.id : createId(),
+            name: task.name.trim().slice(0, 80),
+            minutes,
+            status: status === "active" ? "pending" : status
+          };
+        });
+
+        const history = data.history.map(item => {
+          if (!item || typeof item !== "object" || typeof item.taskName !== "string" || !item.taskName.trim()) {
+            throw new Error("invalid-history-entry");
+          }
+          const completedAt = new Date(item.completedAt);
+          if (Number.isNaN(completedAt.getTime())) throw new Error("invalid-history-date");
+          return {
+            id: typeof item.id === "string" && item.id ? item.id : createId(),
+            taskName: item.taskName.trim().slice(0, 80),
+            completedAt: completedAt.toISOString()
+          };
+        });
+
+        const preferences = data.preferences;
+        const minMinutes = clampInteger(preferences.minMinutes, 1, 180);
+        const maxMinutes = clampInteger(preferences.maxMinutes, 1, 180);
+        if (minMinutes === null || maxMinutes === null || minMinutes > maxMinutes) {
+          throw new Error("invalid-duration-range");
+        }
+
+        return {
+          tasks,
+          history,
+          preferences: {
+            warmupEnabled: Boolean(preferences.warmupEnabled),
+            minMinutes,
+            maxMinutes
+          }
+        };
+      }
+
+      async function importData(file) {
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) {
+          showToast("toast.importTooLarge");
+          return;
+        }
+        if (!window.confirm(t("confirm.importOverwrite"))) return;
+
+        try {
+          const normalized = validateBackup(JSON.parse(await file.text()));
+          stopInterval();
+          state.tasks = normalized.tasks;
+          state.history = normalized.history;
+          state.currentIndex = -1;
+          state.remainingSeconds = 0;
+          state.totalSeconds = 0;
+          state.endTime = null;
+          state.isRunning = false;
+          state.sessionActive = false;
+          state.modalAction = null;
+          state.modalContext = null;
+          state.warmupActive = false;
+          state.selectedDate = localDateKey();
+          state.calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+          els.modalBackdrop.hidden = true;
+          els.warmupToggle.checked = normalized.preferences.warmupEnabled;
+          els.minMinutes.value = normalized.preferences.minMinutes;
+          els.maxMinutes.value = normalized.preferences.maxMinutes;
+          saveTasks();
+          saveHistory();
+          savePreferences();
+          validateRange();
+          renderTasks();
+          renderTimer();
+          renderCalendar();
+          showToast("toast.imported");
+        } catch (_) {
+          showToast("toast.importInvalid");
+        }
+      }
+
+      function recordCompletion(task) {
+        state.history.push({
+          id: createId(),
+          taskName: task.name,
+          completedAt: new Date().toISOString()
+        });
+        saveHistory();
+        state.selectedDate = localDateKey();
+        state.calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        renderCalendar();
+      }
+
+      function historyForDate(dateKey) {
+        return state.history.filter(item => localDateKey(new Date(item.completedAt)) === dateKey);
+      }
+
+      function renderHistoryDetails() {
+        const selected = new Date(`${state.selectedDate}T12:00:00`);
+        const entries = historyForDate(state.selectedDate).slice().reverse();
+        const todayKey = localDateKey();
+        els.historyDate.textContent = state.selectedDate === todayKey
+          ? t("calendar.today")
+          : new Intl.DateTimeFormat(translations[state.language]._meta.locale, { month: "long", day: "numeric" }).format(selected);
+        els.historySummary.textContent = entries.length ? tp("calendar.completedCount", entries.length) : t("calendar.noRecords");
+        els.historyList.innerHTML = entries.length
+          ? entries.map(item => {
+              const completedAt = new Date(item.completedAt);
+              const time = `${String(completedAt.getHours()).padStart(2, "0")}:${String(completedAt.getMinutes()).padStart(2, "0")}`;
+              return `<li class="history-item"><strong>${escapeHtml(item.taskName)}</strong><time datetime="${escapeHtml(item.completedAt)}">${escapeHtml(t("calendar.completedAt", { time }))}</time></li>`;
+            }).join("")
+          : `<li class="history-empty">${escapeHtml(t("calendar.emptyDetail"))}</li>`;
+      }
+
+      function renderCalendar() {
+        const year = state.calendarMonth.getFullYear();
+        const month = state.calendarMonth.getMonth();
+        const locale = translations[state.language]._meta.locale;
+        const monthName = new Intl.DateTimeFormat(locale, { month: "long" }).format(state.calendarMonth);
+        els.calendarHeading.textContent = t("calendar.monthHeading", { year, month: monthName });
+        const firstWeekday = (new Date(year, month, 1).getDay() + 6) % 7;
+        const gridStart = new Date(year, month, 1 - firstWeekday);
+        const todayKey = localDateKey();
+        const days = [];
+
+        for (let offset = 0; offset < 42; offset += 1) {
+          const date = new Date(gridStart);
+          date.setDate(gridStart.getDate() + offset);
+          const dateKey = localDateKey(date);
+          const count = historyForDate(dateKey).length;
+          const classes = ["calendar-day"];
+          if (date.getMonth() !== month) classes.push("is-outside");
+          if (dateKey === todayKey) classes.push("is-today");
+          if (dateKey === state.selectedDate) classes.push("is-selected");
+          const dayMonth = new Intl.DateTimeFormat(locale, { month: "long" }).format(date);
+          const dayLabel = t("calendar.dayLabel", { month: dayMonth, day: date.getDate(), count });
+          const countLabel = count ? `<span class="day-count">${escapeHtml(t("calendar.dayCount", { count }))}</span>` : "";
+          days.push(`<button class="${classes.join(" ")}" type="button" data-date="${dateKey}" aria-label="${escapeHtml(dayLabel)}"><span class="day-number">${date.getDate()}</span>${countLabel}</button>`);
+        }
+        els.calendarGrid.innerHTML = days.join("");
+        renderHistoryDetails();
+      }
+
+      function renderTasks() {
+        els.taskCount.textContent = state.tasks.length;
+        els.taskCount.setAttribute("aria-label", tp("tasks.count", state.tasks.length));
+
+        if (!state.tasks.length) {
+          els.taskList.innerHTML = `<li class="empty-state"><div><strong>${escapeHtml(t("tasks.emptyTitle"))}</strong>${escapeHtml(t("tasks.emptyBody"))}</div></li>`;
+        } else {
+          els.taskList.innerHTML = state.tasks.map((task, index) => {
+            const statusLabel = task.status === "completed"
+              ? t("tasks.completed")
+              : task.status === "active"
+                ? state.warmupActive ? t("tasks.warmupStatus") : t("tasks.activeMinutes", { minutes: task.minutes })
+                : task.minutes ? t("tasks.pendingMinutes", { minutes: task.minutes }) : t("tasks.pending");
+            return `
+            <li class="task-item is-${task.status}">
+              <span class="task-index">${String(index + 1).padStart(2, "0")}</span>
+              <span class="task-name" title="${escapeHtml(task.name)}">${escapeHtml(task.name)}</span>
+              <span class="duration-badge ${task.status === "active" ? "active" : task.status === "completed" ? "completed" : task.minutes ? "" : "unset"}">${escapeHtml(statusLabel)}</span>
+              <button class="icon-btn" type="button" data-delete="${task.id}" aria-label="${escapeHtml(t("tasks.deleteLabel", { name: task.name }))}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                  <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5" />
+                </svg>
+              </button>
+            </li>
+          `;
+          }).join("");
+        }
+
+        const range = getRange();
+        const hasPendingTasks = state.tasks.some(task => task.status === "pending");
+        const hasActiveTask = state.tasks.some(task => task.status === "active");
+        els.drawButton.textContent = t(state.sessionActive ? "timer.resumeRound" : "timer.draw");
+        els.drawButton.disabled = !hasPendingTasks || !range.valid || hasActiveTask;
+        els.clearTasksButton.disabled = state.tasks.length === 0;
+      }
+
+      function formatTime(seconds) {
+        const safe = Math.max(0, seconds);
+        const minutes = Math.floor(safe / 60);
+        const secs = safe % 60;
+        return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      }
+
+      function renderTimer() {
+        const task = state.tasks[state.currentIndex];
+        const completed = state.tasks.filter(item => item.status === "completed").length;
+        const pending = state.tasks.filter(item => item.status === "pending").length;
+        const total = state.tasks.length;
+        const progress = total ? (completed / total) * 100 : 0;
+
+        els.progressText.textContent = `${completed} / ${total}`;
+        els.progressFill.style.width = `${progress}%`;
+        els.progressTrack.setAttribute("aria-valuemax", String(total));
+        els.progressTrack.setAttribute("aria-valuenow", String(completed));
+
+        if (!task || task.status !== "active" || !state.sessionActive) {
+          els.roundChip.textContent = t(state.sessionActive && pending ? "timer.roundResume" : total ? "timer.roundDraw" : "timer.roundWaiting");
+          els.currentKicker.textContent = t("timer.kickerReady");
+          els.currentTask.textContent = t(state.sessionActive && pending ? "timer.taskResume" : completed === total && total ? "timer.taskAllDone" : total ? "timer.taskReady" : "timer.taskEmpty");
+          els.timeDisplay.textContent = "00:00";
+          els.clockCaption.textContent = t("timer.captionReady");
+          els.timerHint.textContent = t(state.sessionActive && pending ? "timer.hintResume" : completed === total && total ? "timer.hintAllDone" : total ? "timer.hintReady" : "timer.hintEmpty");
+          els.startPauseButton.textContent = t("timer.start");
+          els.startPauseButton.disabled = true;
+          els.completeButton.disabled = true;
+          els.skipButton.disabled = true;
+          els.clock.style.setProperty("--progress", "0deg");
+          els.clock.setAttribute("aria-label", t("timer.notStartedLabel"));
+          return;
+        }
+
+        els.roundChip.textContent = t("timer.roundPending", { count: pending + 1 });
+        els.currentKicker.textContent = t(state.warmupActive ? "timer.kickerWarmup" : state.isRunning ? "timer.kickerFocusing" : "timer.kickerTurn");
+        els.currentTask.textContent = task.name;
+        els.timeDisplay.textContent = formatTime(state.remainingSeconds);
+        els.clockCaption.textContent = t(state.warmupActive ? "timer.captionWarmup" : state.isRunning ? "timer.captionFocusing" : "timer.captionPaused");
+        els.timerHint.textContent = state.warmupActive
+          ? t("timer.hintWarmup")
+          : state.isRunning ? t("timer.hintRunning") : t("timer.hintDuration", { minutes: task.minutes });
+        els.startPauseButton.disabled = false;
+        els.completeButton.disabled = false;
+        els.skipButton.disabled = false;
+        els.startPauseButton.textContent = t(state.isRunning ? "timer.pause" : state.remainingSeconds < state.totalSeconds ? "timer.resume" : state.warmupActive ? "timer.startWarmup" : "timer.start");
+
+        const ratio = state.totalSeconds ? 1 - state.remainingSeconds / state.totalSeconds : 0;
+        els.clock.style.setProperty("--progress", `${Math.max(0, Math.min(1, ratio)) * 360}deg`);
+        els.clock.setAttribute("aria-label", t("timer.remainingLabel", { time: formatTime(state.remainingSeconds) }));
+      }
+
+      function validateRange() {
+        const range = getRange();
+        els.validation.textContent = range.message;
+        renderTasks();
+        return range;
+      }
+
+      function addTask(name) {
+        const cleanName = name.trim().replace(/\s+/g, " ");
+        if (!cleanName) {
+          showToast("toast.enterTask");
+          els.taskInput.focus();
+          return;
+        }
+        const range = getRange();
+        if (state.sessionActive && !range.valid) {
+          els.validation.textContent = range.message;
+          showToast("toast.fixRange");
+          return;
+        }
+        const minutes = state.sessionActive ? randomInteger(range.min, range.max) : null;
+        state.tasks.push({ id: createId(), name: cleanName, minutes, status: "pending" });
+        saveTasks();
+        els.taskInput.value = "";
+        renderTasks();
+        renderTimer();
+        showToast(state.sessionActive ? "toast.addedWithDuration" : "toast.added", { minutes });
+        els.taskInput.focus();
+      }
+
+      function deleteTask(id) {
+        const taskToDelete = state.tasks.find(task => task.id === id);
+        if (!taskToDelete) return;
+        const currentTask = state.tasks[state.currentIndex];
+        const currentTaskId = currentTask ? currentTask.id : null;
+        const deletingActiveTask = taskToDelete.status === "active";
+
+        if (deletingActiveTask) {
+          stopInterval();
+          state.currentIndex = -1;
+          state.remainingSeconds = 0;
+          state.totalSeconds = 0;
+          state.endTime = null;
+          state.isRunning = false;
+          state.warmupActive = false;
+          state.modalAction = null;
+          state.modalContext = null;
+          els.modalBackdrop.hidden = true;
+        }
+
+        state.tasks = state.tasks.filter(task => task.id !== id);
+        if (!deletingActiveTask && currentTaskId) {
+          state.currentIndex = state.tasks.findIndex(task => task.id === currentTaskId);
+        }
+        if (!state.tasks.some(task => task.status === "pending" || task.status === "active")) {
+          state.sessionActive = false;
+        }
+        saveTasks();
+        renderTasks();
+        renderTimer();
+        showToast(deletingActiveTask ? "toast.deletedActive" : "toast.deleted");
+      }
+
+      function clearTasks() {
+        if (!state.tasks.length) return;
+        if (!window.confirm(t("confirm.clearTasks"))) return;
+        stopInterval();
+        state.tasks = [];
+        state.currentIndex = -1;
+        state.remainingSeconds = 0;
+        state.totalSeconds = 0;
+        state.endTime = null;
+        state.isRunning = false;
+        state.sessionActive = false;
+        state.modalAction = null;
+        state.modalContext = null;
+        state.warmupActive = false;
+        els.modalBackdrop.hidden = true;
+        saveTasks();
+        renderTasks();
+        renderTimer();
+        showToast("toast.cleared");
+        els.taskInput.focus();
+      }
+
+      function drawSession() {
+        const range = validateRange();
+        if (!range.valid || !state.tasks.length) return;
+        stopInterval();
+        state.currentIndex = -1;
+        if (state.sessionActive) {
+          const nextTask = selectNextTask();
+          renderTasks();
+          renderTimer();
+          if (nextTask) showToast("toast.sessionResumed");
+          return;
+        }
+        state.tasks = state.tasks.map(task => task.status === "pending" ? ({
+          ...task,
+          minutes: randomInteger(range.min, range.max)
+        }) : task);
+        state.sessionActive = true;
+        state.isRunning = false;
+        selectNextTask();
+        saveTasks();
+        renderTasks();
+        renderTimer();
+        showToast("toast.sessionGenerated");
+      }
+
+      function pendingIndexes(excludedId = null) {
+        const all = state.tasks
+          .map((task, index) => ({ task, index }))
+          .filter(({ task }) => task.status === "pending");
+        const withoutPrevious = excludedId ? all.filter(({ task }) => task.id !== excludedId) : all;
+        return (withoutPrevious.length ? withoutPrevious : all).map(({ index }) => index);
+      }
+
+      function selectNextTask(excludedId = null) {
+        const candidates = pendingIndexes(excludedId);
+        if (!candidates.length) {
+          state.currentIndex = -1;
+          saveTasks();
+          return null;
+        }
+        state.currentIndex = candidates[randomInteger(0, candidates.length - 1)];
+        state.tasks[state.currentIndex].status = "active";
+        prepareCurrentTask();
+        saveTasks();
+        return state.tasks[state.currentIndex];
+      }
+
+      function prepareCurrentTask() {
+        const task = state.tasks[state.currentIndex];
+        if (!task) return;
+        state.warmupActive = els.warmupToggle.checked;
+        state.totalSeconds = state.warmupActive ? 3 * 60 : task.minutes * 60;
+        state.remainingSeconds = state.totalSeconds;
+        state.endTime = null;
+        state.isRunning = false;
+      }
+
+      function primeAudio() {
+        try {
+          audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+          if (audioContext.state === "suspended") audioContext.resume();
+        } catch (_) {
+          audioContext = null;
+        }
+      }
+
+      function playChime() {
+        if (!audioContext) return;
+        const now = audioContext.currentTime;
+        [523.25, 659.25, 783.99].forEach((frequency, index) => {
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          oscillator.type = "sine";
+          oscillator.frequency.value = frequency;
+          gain.gain.setValueAtTime(0.0001, now + index * .16);
+          gain.gain.exponentialRampToValueAtTime(.18, now + index * .16 + .02);
+          gain.gain.exponentialRampToValueAtTime(.0001, now + index * .16 + .34);
+          oscillator.connect(gain).connect(audioContext.destination);
+          oscillator.start(now + index * .16);
+          oscillator.stop(now + index * .16 + .36);
+        });
+      }
+
+      function notifyUser(title, body) {
+        playChime();
+        if (navigator.vibrate) navigator.vibrate([180, 100, 180]);
+        if ("Notification" in window && Notification.permission === "granted") {
+          try { new Notification(title, { body }); } catch (_) { /* visual modal remains available */ }
+        }
+      }
+
+      function requestNotificationPermission() {
+        if (!("Notification" in window) || Notification.permission !== "default") return;
+        try {
+          const permission = Notification.requestPermission();
+          if (permission && typeof permission.catch === "function") permission.catch(() => {});
+        } catch (_) { /* file origins may not allow notifications */ }
+      }
+
+      function startTimer() {
+        if (!state.sessionActive || state.remainingSeconds <= 0) return;
+        primeAudio();
+        requestNotificationPermission();
+        state.endTime = Date.now() + state.remainingSeconds * 1000;
+        state.isRunning = true;
+        stopInterval();
+        state.timerId = setInterval(tick, 250);
+        saveTasks();
+        tick();
+      }
+
+      function pauseTimer() {
+        if (!state.isRunning) return;
+        syncRemainingTime();
+        state.isRunning = false;
+        state.endTime = null;
+        stopInterval();
+        saveTasks();
+        renderTimer();
+      }
+
+      function stopInterval() {
+        if (state.timerId !== null) clearInterval(state.timerId);
+        state.timerId = null;
+      }
+
+      function syncRemainingTime() {
+        if (!state.isRunning || state.endTime === null) return;
+        state.remainingSeconds = Math.max(0, Math.ceil((state.endTime - Date.now()) / 1000));
+      }
+
+      function tick() {
+        syncRemainingTime();
+        renderTimer();
+        if (state.remainingSeconds <= 0) finishCurrentTask(false);
+      }
+
+      function finishCurrentTask(manual) {
+        const currentTask = state.tasks[state.currentIndex];
+        if (!state.sessionActive || !currentTask || currentTask.status !== "active") return;
+        stopInterval();
+        state.isRunning = false;
+        state.remainingSeconds = 0;
+        renderTimer();
+        if (manual) {
+          resolveCurrentTask("completed", true);
+          return;
+        }
+        if (state.warmupActive) {
+          notifyUser(t("notification.warmupTitle"), t("notification.warmupBody", { task: currentTask.name }));
+          openWarmupModal(currentTask.name);
+          return;
+        }
+        notifyUser(t("notification.timeUpTitle"), t("notification.timeUpBody", { task: currentTask.name }));
+        openDecisionModal(currentTask.name);
+      }
+
+      function skipCurrentTask() {
+        const currentTask = state.tasks[state.currentIndex];
+        if (!state.sessionActive || !currentTask || currentTask.status !== "active") return;
+        const skippedId = currentTask.id;
+        const skippedName = currentTask.name;
+
+        stopInterval();
+        currentTask.status = "pending";
+        state.currentIndex = -1;
+        state.remainingSeconds = 0;
+        state.totalSeconds = 0;
+        state.endTime = null;
+        state.isRunning = false;
+        state.warmupActive = false;
+        state.modalAction = null;
+        state.modalContext = null;
+        els.modalBackdrop.hidden = true;
+
+        const hasAnotherPendingTask = state.tasks.some(task => task.status === "pending" && task.id !== skippedId);
+        const nextTask = hasAnotherPendingTask ? selectNextTask(skippedId) : null;
+        saveTasks();
+        renderTasks();
+        renderTimer();
+
+        if (nextTask) {
+          showToast("toast.skippedNext", { task: skippedName });
+          els.startPauseButton.focus();
+        } else {
+          showToast("toast.skippedOnly");
+          els.drawButton.focus();
+        }
+      }
+
+      function resolveCurrentTask(action, manual = false) {
+        const currentTask = state.tasks[state.currentIndex];
+        if (!currentTask || currentTask.status !== "active") return;
+        const finishedName = currentTask.name;
+        const finishedId = currentTask.id;
+        state.endTime = null;
+        state.warmupActive = false;
+
+        if (action === "requeue") {
+          const range = getRange();
+          currentTask.status = "pending";
+          if (range.valid) {
+            currentTask.minutes = randomInteger(range.min, range.max);
+          } else {
+            showToast("toast.rangeRetained");
+          }
+        } else {
+          recordCompletion(currentTask);
+          currentTask.status = "completed";
+        }
+
+        saveTasks();
+        state.currentIndex = -1;
+        const nextTask = selectNextTask(action === "requeue" ? finishedId : null);
+        renderTasks();
+        renderTimer();
+
+        if (!nextTask) {
+          const score = randomInteger(100, 300);
+          notifyUser(t("notification.allDoneTitle"), t("notification.allDoneBody", { score }));
+          openCompletionModal(score);
+          return;
+        }
+
+        openNextModal(finishedName, nextTask.name, action, manual);
+      }
+
+      function continueFiveMinutes() {
+        const currentTask = state.tasks[state.currentIndex];
+        if (!currentTask || currentTask.status !== "active") return;
+        els.modalBackdrop.hidden = true;
+        els.decisionActions.hidden = true;
+        els.modalButton.hidden = false;
+        state.modalAction = null;
+        state.modalContext = null;
+        state.warmupActive = false;
+        state.totalSeconds = 5 * 60;
+        state.remainingSeconds = state.totalSeconds;
+        saveTasks();
+        startTimer();
+        showToast("toast.focusMore");
+      }
+
+      function openDecisionModal(taskName) {
+        state.modalAction = "decision";
+        state.modalContext = { taskName };
+        els.modalBackdrop.hidden = false;
+        renderOpenModal();
+        setTimeout(() => els.markCompletedButton.focus(), 0);
+      }
+
+      function openWarmupModal(taskName) {
+        state.modalAction = "warmup";
+        state.modalContext = { taskName };
+        els.modalBackdrop.hidden = false;
+        renderOpenModal();
+        setTimeout(() => els.startFullTaskButton.focus(), 0);
+      }
+
+      function startFullTask() {
+        const currentTask = state.tasks[state.currentIndex];
+        if (!currentTask || currentTask.status !== "active") return;
+        els.modalBackdrop.hidden = true;
+        els.warmupActions.hidden = true;
+        els.modalButton.hidden = false;
+        state.modalAction = null;
+        state.modalContext = null;
+        state.warmupActive = false;
+        state.totalSeconds = currentTask.minutes * 60;
+        state.remainingSeconds = state.totalSeconds;
+        saveTasks();
+        startTimer();
+        renderTasks();
+        showToast("toast.fullTimerStarted", { minutes: currentTask.minutes });
+      }
+
+      function openNextModal(doneName, nextName, action, manual) {
+        state.modalAction = "next";
+        state.modalContext = { doneName, nextName, action, manual };
+        els.modalBackdrop.hidden = false;
+        renderOpenModal();
+        setTimeout(() => els.modalButton.focus(), 0);
+      }
+
+      function openCompletionModal(score) {
+        state.modalAction = "complete";
+        state.modalContext = { score };
+        els.modalBackdrop.hidden = false;
+        renderOpenModal();
+        setTimeout(() => els.modalButton.focus(), 0);
+      }
+
+      function renderOpenModal() {
+        if (els.modalBackdrop.hidden || !state.modalAction || !state.modalContext) return;
+        const context = state.modalContext;
+        els.scoreWrap.hidden = true;
+        els.decisionActions.hidden = true;
+        els.warmupActions.hidden = true;
+        els.modalButton.hidden = false;
+
+        if (state.modalAction === "decision") {
+          els.modalIcon.textContent = "?";
+          els.modalTitle.textContent = t("modal.decisionTitle");
+          els.modalMessage.textContent = t("modal.decisionMessage", { task: context.taskName });
+          els.modalButton.hidden = true;
+          els.decisionActions.hidden = false;
+        } else if (state.modalAction === "warmup") {
+          els.modalIcon.textContent = "3";
+          els.modalTitle.textContent = t("modal.warmupTitle");
+          els.modalMessage.textContent = t("modal.warmupMessage", { task: context.taskName });
+          els.modalButton.hidden = true;
+          els.warmupActions.hidden = false;
+        } else if (state.modalAction === "next") {
+          els.modalIcon.textContent = context.action === "requeue" ? "↻" : "✓";
+          els.modalTitle.textContent = t(context.action === "requeue" ? "modal.requeuedTitle" : context.manual ? "modal.earlyTitle" : "modal.completedTitle");
+          els.modalMessage.textContent = t(context.action === "requeue" ? "modal.requeuedMessage" : "modal.completedMessage", { done: context.doneName, next: context.nextName });
+          els.modalButton.textContent = t("modal.viewNext");
+        } else if (state.modalAction === "complete") {
+          els.modalIcon.textContent = "★";
+          els.modalTitle.textContent = t("modal.allDoneTitle");
+          els.modalMessage.textContent = t("modal.allDoneMessage");
+          els.scoreWrap.hidden = false;
+          els.scoreValue.textContent = context.score;
+          els.modalButton.textContent = t("modal.collectReward");
+        }
+      }
+
+      function closeModal() {
+        if (state.modalAction === "decision" || state.modalAction === "warmup") return;
+        els.modalBackdrop.hidden = true;
+        if (state.modalAction === "complete") {
+          state.sessionActive = false;
+          state.currentIndex = -1;
+          state.remainingSeconds = 0;
+          state.totalSeconds = 0;
+          state.warmupActive = false;
+          saveTasks();
+          renderTasks();
+          renderTimer();
+          els.drawButton.focus();
+        } else {
+          els.startPauseButton.focus();
+        }
+        state.modalAction = null;
+        state.modalContext = null;
+      }
+
+      els.taskForm.addEventListener("submit", event => {
+        event.preventDefault();
+        addTask(els.taskInput.value);
+      });
+
+      els.languageSwitcher.addEventListener("click", event => {
+        const button = event.target.closest("[data-language]");
+        if (button) setLanguage(button.dataset.language);
+      });
+
+      els.taskList.addEventListener("click", event => {
+        const button = event.target.closest("[data-delete]");
+        if (button) deleteTask(button.dataset.delete);
+      });
+      els.clearTasksButton.addEventListener("click", clearTasks);
+
+      [els.minMinutes, els.maxMinutes].forEach(input => {
+        input.addEventListener("input", validateRange);
+        input.addEventListener("change", () => {
+          if (validateRange().valid) savePreferences();
+        });
+      });
+      els.warmupToggle.addEventListener("change", () => {
+        savePreferences();
+        showToast(els.warmupToggle.checked ? "toast.warmupEnabled" : "toast.warmupDisabled");
+      });
+      els.drawButton.addEventListener("click", drawSession);
+      els.startPauseButton.addEventListener("click", () => state.isRunning ? pauseTimer() : startTimer());
+      els.completeButton.addEventListener("click", () => finishCurrentTask(true));
+      els.skipButton.addEventListener("click", skipCurrentTask);
+      els.markCompletedButton.addEventListener("click", () => resolveCurrentTask("completed"));
+      els.requeueButton.addEventListener("click", () => resolveCurrentTask("requeue"));
+      els.extendButton.addEventListener("click", continueFiveMinutes);
+      els.startFullTaskButton.addEventListener("click", startFullTask);
+      els.returnFromWarmupButton.addEventListener("click", () => resolveCurrentTask("requeue"));
+      els.modalButton.addEventListener("click", closeModal);
+      els.privacyButton.addEventListener("click", () => {
+        els.privacyBackdrop.hidden = false;
+        setTimeout(() => els.privacyCloseButton.focus(), 0);
+      });
+      els.privacyCloseButton.addEventListener("click", () => {
+        els.privacyBackdrop.hidden = true;
+        els.privacyButton.focus();
+      });
+      els.privacyBackdrop.addEventListener("click", event => {
+        if (event.target === els.privacyBackdrop) els.privacyCloseButton.click();
+      });
+      els.exportButton.addEventListener("click", exportData);
+      els.importButton.addEventListener("click", () => els.importFileInput.click());
+      els.importFileInput.addEventListener("change", async () => {
+        await importData(els.importFileInput.files && els.importFileInput.files[0]);
+        els.importFileInput.value = "";
+      });
+
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && !els.privacyBackdrop.hidden) els.privacyCloseButton.click();
+      });
+
+      els.calendarGrid.addEventListener("click", event => {
+        const button = event.target.closest("[data-date]");
+        if (!button) return;
+        state.selectedDate = button.dataset.date;
+        const selected = new Date(`${state.selectedDate}T12:00:00`);
+        state.calendarMonth = new Date(selected.getFullYear(), selected.getMonth(), 1);
+        renderCalendar();
+      });
+
+      els.previousMonthButton.addEventListener("click", () => {
+        state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() - 1, 1);
+        renderCalendar();
+      });
+
+      els.nextMonthButton.addEventListener("click", () => {
+        state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() + 1, 1);
+        renderCalendar();
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible" && state.isRunning) tick();
+      });
+
+      window.addEventListener("beforeunload", event => {
+        if (!state.isRunning) return;
+        event.preventDefault();
+        event.returnValue = "";
+      });
+
+      const recoveryMessage = loadLocalData();
+      setLanguage(state.language);
+      if (recoveryMessage) showToast(recoveryMessage.key, recoveryMessage.variables);
+    })();
+  </script>
+</body>
+</html>
